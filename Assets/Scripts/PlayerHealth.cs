@@ -7,15 +7,16 @@ using MLAPI.Messaging;
 
 public class PlayerHealth : NetworkBehaviour
 {
-    public NetworkVariableFloat health = new NetworkVariableFloat(0f),
-        LifeCount = new NetworkVariableFloat(3f);
+    public NetworkVariableFloat health = new NetworkVariableFloat(0f), LifeCount = new NetworkVariableFloat(3f);
     public float StartingHealth = 0f;
     public float CurrentHealth;
-    public GameObject ConnectionGO;
+    public bool sentDeath = false;
+
     private void Start()
     {
         LifeCount.Value = 3f;
     }
+
     void FixedUpdate()
     {
         CurrentHealth = health.Value;
@@ -28,9 +29,12 @@ public class PlayerHealth : NetworkBehaviour
             this.GetComponent<FPSMovement>().enabled = true;
             RespawnServerRpc();
         }
-        if(this.LifeCount.Value == 0)
+        if(this.LifeCount.Value == 0 && sentDeath == false)
         {
-            this.GetComponent<PlayerManager>().GameManagerGO.GetComponent<GameManager>().getLosers();
+            this.GetComponent<PlayerManager>().currentRank = PlayerManager.playerArr.Count;
+            //this.GetComponent<PlayerManager>().GameManagerGO.GetComponent<GameManager>().getLosers();
+            this.GetComponent<PlayerManager>().setAliveTime();
+            sentDeath = true;
         }
     }
 

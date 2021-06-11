@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using MLAPI;
 using MLAPI.Connection;
 using MLAPI.Messaging;
@@ -12,23 +13,18 @@ public class GameManager : NetworkBehaviour
     private float timeLeft;
     public bool gameOver = false;
     GameObject winnerGO;
-
-    struct losers{
-        public bool isLoser;
-        public GameObject _gameObject;
-    }
-    List<losers> losersArr = new List<losers>();
     float quitTime = 3f;
+
     // Start is called before the first frame update
     void Start()
     {
         timeLeft = RoundTimer;
+        gameOver = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-
         timeLeft -= Time.deltaTime;
         if(timeLeft < 1 || gameOver) //get an update on if a live has gone to 0
         {
@@ -41,47 +37,26 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    
     public void getLosers()
     {
-        if(NetworkManager.ConnectedClientsList.Count > 3)
-        {
-            if(NetworkManager.ConnectedClientsList[0].PlayerObject.gameObject.GetComponent<PlayerHealth>().LifeCount.Value == 0)
-            {
-                winnerGO = NetworkManager.ConnectedClientsList[1].PlayerObject.gameObject;
-                winnerGO.GetComponent<PlayerManager>()._text.text = "YOU WIN";
-                NetworkManager.ConnectedClientsList[0].PlayerObject.gameObject.GetComponent<PlayerManager>()._text.text = "YOU LOSE";
-            }
-            else
-                winnerGO = NetworkManager.ConnectedClientsList[0].PlayerObject.gameObject;
-            gameOver = true;
-        }
-        //else if()
-        //{
-        //    for (int i = 0; i < NetworkManager.ConnectedClientsList.Count; i++)
-        //    {
-        //        GameObject tempGO = NetworkManager.ConnectedClientsList[i].PlayerObject.gameObject;
-        //
-        //        if (tempGO.GetComponent<PlayerHealth>().LifeCount.Value == 0)
-        //        {
-        //            tempLo._gameObject = NetworkManager.ConnectedClientsList[i].PlayerObject.gameObject;
-        //            tempLo.isLoser = true;
-        //            losersArr.Add(tempLo);
-        //        }
-        //       else if (tempGO.GetComponent<PlayerHealth>().LifeCount.Value == 2)
-        //        {
-        //            tempLo._gameObject = NetworkManager.ConnectedClientsList[i].PlayerObject.gameObject;
-        //            tempLo.isLoser = true;
-        //            losersArr.Add(tempLo);
-        //        }
-        //       else if (tempGO.GetComponent<PlayerHealth>().LifeCount.Value == 3)
-        //        {
-        //            tempLo._gameObject = NetworkManager.ConnectedClientsList[i].PlayerObject.gameObject;
-        //            tempLo.isLoser = true;
-        //            losersArr.Add(tempLo);
-        //        }
-        //    }
-        //}
+        //Debug.Log("Start of GameManager is Over");
 
+        for (int i = 0; i < PlayerManager.playerArr.Count; i++)
+        {
+            PlayerManager.ConnectedPlayers tempPlayer = PlayerManager.playerArr[i];
+            if (tempPlayer.rank == 1)
+            {
+                winnerGO = tempPlayer._gameObject;
+                winnerGO.GetComponent<PlayerManager>().setWinnerTextClientRPC();
+                //winnerGO.GetComponent<PlayerManager>().enabled = false;
+                //winnerGO.GetComponentInChildren<Canvas>().GetComponentInChildren<Text>().text = "YOU WIN";
+            }
+            else if(tempPlayer.rank > 1)
+            {
+                PlayerManager.playerArr[i]._gameObject.GetComponent<PlayerManager>().setLoserTextClientRpc();
+            }
+        }
+        gameOver = true;
+        //Debug.Log("Game is Over");
     }
 }

@@ -8,18 +8,20 @@ using MLAPI.NetworkVariable;
 public class PlayerShoot : NetworkBehaviour{
  
     
-    public float fireRate = 10f, shootTimer = 0f, damageScale = 15f;
+    public float fireRate = 10f, shootTimer = 0f, damageScale = 25f;
     public ParticleSystem bulletParticleSystem;
     ParticleSystem.EmissionModule em;
     NetworkVariableBool shooting = new NetworkVariableBool(new NetworkVariableSettings { WritePermission = NetworkVariablePermission.OwnerOnly}, false);
     public GameObject wallPrefab;
     // Use this for initialization
-    void Start () {
+    void Start () 
+    {
         em = bulletParticleSystem.emission;
     }
    
     // Update is called once per frame
-    void Update () {
+    void Update () 
+    {
         if(IsLocalPlayer)
         {
             shooting.Value = Input.GetMouseButton(0);
@@ -32,7 +34,6 @@ public class PlayerShoot : NetworkBehaviour{
             }
         }
         em.rateOverTime = shooting.Value ? fireRate : 0f;
-
     }
     //these run on server and are called by client    client -> server
 
@@ -51,11 +52,10 @@ public class PlayerShoot : NetworkBehaviour{
             }
             else if (hit.collider.gameObject.tag == "Floor")
             {
-                Vector3 blockPos = new Vector3(hit.point.x, hit.point.y, hit.point.z);
-                Instantiate(wallPrefab, blockPos, Quaternion.identity);
+                //createWall(hit, ray);
+
             }
         }
-
         ShootClientRpc();
     }
 
@@ -72,10 +72,24 @@ public class PlayerShoot : NetworkBehaviour{
             }
             else if (hit.collider.gameObject.tag == "Floor")
             {
-                Vector3 blockPos = new Vector3(hit.point.x, hit.point.y, hit.point.z);
-
-                Instantiate(wallPrefab, blockPos, Quaternion.identity);
+                createWall(hit, ray);
             }
         }
     }    
+
+    void createWall(RaycastHit hit, Ray ray)
+    {
+        
+        
+            Debug.Log("Called");
+            Vector3 blockPos = new Vector3(hit.point.x, hit.point.y + .5f, hit.point.z);
+
+            blockPos = blockPos - new Vector3(ray.direction.x, 0, ray.direction.z);
+
+            //Vector3 blockPos = hit.point;
+
+            Instantiate(wallPrefab, blockPos, Quaternion.identity);
+        
+
+    }
 }

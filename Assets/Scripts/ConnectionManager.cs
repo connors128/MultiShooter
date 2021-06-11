@@ -9,7 +9,7 @@ using System;
 
 public class ConnectionManager : MonoBehaviour
 {
-    public GameObject connectionButtonPanel;
+    public GameObject connectionButtonPanel, hostPlayerGO;
     public Camera mainCamera;
     public string ipaddress = "127.0.0.1";
     UNetTransport transport;
@@ -36,16 +36,14 @@ public class ConnectionManager : MonoBehaviour
     {
         transport = NetworkManager.Singleton.GetComponent<UNetTransport>();
         transport.ConnectAddress = ipaddress;
-
+        
         NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("Password1234"); //why is this important?? Encodes password as byte array
         NetworkManager.Singleton.StartClient();
 
-            connectionButtonPanel.SetActive(false);
-            mainCamera.gameObject.SetActive(false);
-            //Debug.Log(NetworkManager.Singleton.ConnectedClientsList);
-  
+        connectionButtonPanel.SetActive(false);
+        mainCamera.gameObject.SetActive(false);
+        //Debug.Log(NetworkManager.Singleton.ConnectedClientsList);
     }
-
 
     Vector3 StartSpawnPos()
     {

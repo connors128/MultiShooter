@@ -3,15 +3,11 @@ using MLAPI;
 
 public class FPSMovement : NetworkBehaviour
 {
-    public float walkSpeed = 6.0f,
-                 jumpSpeed = 8.0f,
-                 runMultiplyer = 1.5f,
-                 gravity = 20.0f;
-        
+    public float walkSpeed = 6.0f, jumpSpeed = 8.0f, runMultiplyer = 1.5f, gravity = 20.0f;
     public Vector3 moveDirection = Vector3.zero;
-
     public CharacterController controller;
     Transform cameraTransform;
+
     void Start()
     {
         cameraTransform = GetComponentInChildren<Camera>().transform;
